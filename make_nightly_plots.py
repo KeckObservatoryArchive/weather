@@ -87,7 +87,7 @@ def make_weather_plots(utDate, wxDir, log_writer=''):
             try:
                 archData = get_archiver_data(utDate, i, channel)
                 data.append(archData)
-                joinSeq = (wxDir, '/nightly', str(i), '/k', str(i), '_', names[key], '.txt')
+                joinSeq = (wxDir, '/nightly', str(i), '/k', str(i), '_', utDate.replace('-',''), '_', names[key], '.dat')
                 file = ''.join(joinSeq)
                 archData.to_csv(file, sep='\t')
             except:
@@ -180,7 +180,7 @@ def make_fwhm_plots(utDate, wxDir, log_writer=''):
         try:
             channel = f'k{i}:dcs:pnt:cam0:fwhm'
             data = get_archiver_data(utDate, i, channel)
-            joinSeq = (wxDir, '/nightly', str(i), '/k', str(i), '_fwhm.txt')
+            joinSeq = (wxDir, '/nightly', str(i), '/k', str(i), '_', utDate.replace('-',''), '_fwhm.dat')
             file = ''.join(joinSeq)
             data.to_csv(file, sep='\t')
         except IOError as e:
