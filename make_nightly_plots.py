@@ -92,7 +92,7 @@ def make_weather_plots(utDate, wxDir, log_writer=''):
                 archData.to_csv(file, sep='\t')
             except:
                 if log_writer:
-                    log_writer.error('make_fwhm_plots.py unable read archiver data')
+                    log_writer.error('make_weather_plots.py unable to read archiver data')
                 continue
 
         # Format time data
@@ -185,7 +185,7 @@ def make_fwhm_plots(utDate, wxDir, log_writer=''):
             data.to_csv(file, sep='\t')
         except IOError as e:
             if log_writer:
-                log_writer.error('make_fwhm_plots.py unable read archiver data')
+                log_writer.error('make_fwhm_plots.py unable to read archiver data')
             continue
 
         # Set column headers or default to column numbers
