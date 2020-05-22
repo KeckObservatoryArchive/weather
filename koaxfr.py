@@ -38,7 +38,7 @@ def koaxfr(utDate, wxDir, log_writer=''):
             log_writer.info('koaxfr.py transferring directory ({}) to NExScI'.format(wxDir))
             log_writer.info('koaxfr.py {}'.format(cmd))
 
-#       os.system(cmd)
+        os.system(cmd)
         subject = ''.join(('weather ', utDate))
         message = 'weather data successfully transferred to koaxfr'
         send_email(emailTo, emailFrom, subject, message, log_writer)
