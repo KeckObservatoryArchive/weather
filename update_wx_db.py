@@ -3,32 +3,58 @@ import hashlib
 import urllib.request
 import json
 import configparser
+import pymysql.cursors
 
-def updateWxDb(sendUrl, log_writer=''):
+def updateWxDb(utDate, column, value, log_writer=''):
     """
     Sends command to update KOA data
 
-    @param sendUrl: command and field to update
-    @type sendUrl: string
+    @param utDate:     UT date of processing
+    @type utDate:      string (yyyy-mm-dd)
+    @param column:     database column to add/update
+    @type column:      string
+    @param value:      database column value
+    @type value:       string
     @param log_writer: logger
     @type log_writer: logging
     """
 
     user = os.getlogin()
+    if user != 'koaadmin':
+        if log_writer:
+            log_writer.info('update_wx_db.py incorrect user for database update')
+        return
 
     # Database access URL
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
     config = configparser.ConfigParser()
     config.read(dir_path+'/config.live.ini')
-    url = config['API']['KOAAPI']
+    dbhost = config['DB']['HOST']
+    dbuser = config['DB']['USER']
+    dbpass = config['DB']['PASS']
+    dbdb   = config['DB']['DB']
 
-    myHash = hashlib.md5(user.encode('utf-8')).hexdigest()
-    sendUrl = ''.join((url, sendUrl, '&hash=', myHash))
+    try:
+        dbConn = pymysql.connect(dbhost, dbuser, dbpass, dbdb, cursorclass=pymysql.cursors.DictCursor)
+    except:
+        if log_writer:
+            log_writer.info('update_wx_db.py could not connect to koa database')
+        return
 
-    if log_writer:
-        log_writer.info('weather.py {}'.format(sendUrl))
+    # Verify if entry exists or not, then update the column requested
 
-    data = urllib.request.urlopen(sendUrl)
-    if data == False:
-        log_writer.warning('weather.py could not update koawx database table')
+    query = f'select * from koawx where utdate="{utDate}"'
+    with dbConn.cursor() as cursor:
+        num = cursor.execute(query)
+        if num == 0:
+            query = f'insert into koawx set utdate="{utDate}"'
+            if log_writer:
+                log_writer.info('update_wx_db.py {}'.format(query))
+            cursor.execute(query)
+        query = f'update koawx set {column}="{value}" where utdate="{utDate}"'
+        if log_writer:
+            log_writer.info('update_wx_db.py {}'.format(query))
+        cursor.execute(query)
+
+    dbConn.close()

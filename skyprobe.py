@@ -54,8 +54,7 @@ def skyprobe(utDate='', dir='.', log_writer=''):
     except:
         if log_writer:
             log_writer.info('skyprobe.py url does not exist - {}'.format(url))
-            sendUrl = ''.join(('cmd=updateWxDb&utdate=', dbDate, '&column=skyprobe&value=ERROR'))
-            wxdb.updateWxDb(sendUrl, log_writer)
+            wxdb.updateWxDb(dbDate, 'skyprobe', 'ERROR', log_writer)
         return
 
     # Create HTML page
@@ -78,5 +77,4 @@ def skyprobe(utDate='', dir='.', log_writer=''):
 
     if log_writer:
         log_writer.info('skyprobe.py complete for {}'.format(utDate))
-    sendUrl = ''.join(('cmd=updateWxDb&utdate=', dbDate, '&column=skyprobe&value=', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S')))
-    wxdb.updateWxDb(sendUrl, log_writer)
+    wxdb.updateWxDb(dbDate, 'skyprobe', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)

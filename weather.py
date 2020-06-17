@@ -109,14 +109,12 @@ if not os.path.exists(wxDir):
 # koa.koawx entry
 
 if dbUpdate:
-    sendUrl = ''.join(('cmd=updateWxDb&utdate=', utDate, '&column=utdate&value=', utDate))
-    wxdb.updateWxDb(sendUrl, log_writer)
+    wxdb.updateWxDb(utDate, 'utdate', utDate, log_writer)
 
 # No longer use all sky
 
 if dbUpdate:
-    sendUrl = ''.join(('cmd=updateWxDb&utdate=', utDate, '&column=allsky&value=n/a'))
-    wxdb.updateWxDb(sendUrl, log_writer)
+    wxdb.updateWxDb(utDate, 'allsky', 'n/a', log_writer)
 
 # Add utdate to wxDir
 
@@ -155,16 +153,14 @@ os.makedirs(wxDir+'/nightly1')
 os.makedirs(wxDir+'/nightly2')
 if dbUpdate:
     for i in range(1,3):
-        sendUrl = ''.join(('cmd=updateWxDb&utdate=', utDate, '&column=nightly', str(i), '&value=', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S')))
-        wxdb.updateWxDb(sendUrl, log_writer)
+        wxdb.updateWxDb(utDate, f'nightly{i}', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
 
 # Call make_nightly_plots to create weather and fwhm plots
 
 log_writer.info('weather.py calling make_nightly_plots.py')
 mn.make_nightly_plots(utDate, wxDir, log_writer)
 if dbUpdate:
-    sendUrl = ''.join(('cmd=updateWxDb&utdate=', utDate, '&column=graphs&value=', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S')))
-    wxdb.updateWxDb(sendUrl, log_writer)
+    wxdb.updateWxDb(utDate, 'graphs', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
 
 # Get CFHT Skyprobe plot
 
@@ -229,13 +225,11 @@ with open(md5sumFile, 'w') as fp:
 # koa.koawx entry
 
 if dbUpdate:
-    sendUrl = ''.join(('cmd=updateWxDb&utdate=', utDate, '&column=files&value=', str(totalFiles)))
-    wxdb.updateWxDb(sendUrl, log_writer)
+    wxdb.updateWxDb(utDate, 'files', str(totalFiles), log_writer)
 
 totalSize = "{0:.3f}".format(totalSize)
 if dbUpdate:
-    sendUrl = ''.join(('cmd=updateWxDb&utdate=', utDate, '&column=size&value=', str(totalSize)))
-    wxdb.updateWxDb(sendUrl, log_writer)
+    wxdb.updateWxDb(utDate, 'size', str(totalSize), log_writer)
 
 # Transfer data to NExScI
 
@@ -244,12 +238,7 @@ if dbUpdate:
     koaxfr.koaxfr(utDate, wxDir)
 
 if dbUpdate:
-    sendUrl = ''.join(('cmd=updateWxDb&utdate=', utDate, '&column=data_sent&value=', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S')))
-    wxdb.updateWxDb(sendUrl, log_writer)
-
-if dbUpdate:
-    sendUrl = ''.join(('cmd=updateWxDb&utdate=', utDate, '&column=wx_complete&value=', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S')))
-    wxdb.updateWxDb(sendUrl, log_writer)
+    wxdb.updateWxDb(utDate, 'data_sent', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
 
 log_writer.info('weather.py complete for {}'.format(utDate))
 

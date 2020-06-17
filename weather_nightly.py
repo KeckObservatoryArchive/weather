@@ -46,8 +46,7 @@ def weather_nightly(utDate='', wxDir='.', dbUpdate=1, log_writer=''):
                 error = 1
                 if log_writer:
                     log_writer.error('weather_nightly.py nightly directory not found for K{}'.format(i))
-                    sendUrl = ''.join(('cmd=updateWxDb&utdate=', utDate, '&column=nightly', str(i), '&value=ERROR'))
-                    if dbUpdate: wxdb.updateWxDb(sendUrl, log_writer)
+                    if dbUpdate: wxdb.updateWxDb(utDate, f'nightly{i}', 'ERROR', log_writer)
                 continue
 
         joinSeq = (wxDir, '/nightly', str(i))
@@ -73,8 +72,7 @@ def weather_nightly(utDate='', wxDir='.', dbUpdate=1, log_writer=''):
 
         # Update koa.koawx entry
 
-        sendUrl = ''.join(('cmd=updateWxDb&utdate=', utDate, '&column=nightly', str(i), '&value=', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S')))
-        if dbUpdate: wxdb.updateWxDb(sendUrl, log_writer)
+        if dbUpdate: wxdb.updateWxDb(utDate, f'nightly{i}', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
 
     if log_writer:
         log_writer.info('weather_nightly.py complete for {}'.format(utDate))
