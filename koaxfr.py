@@ -2,6 +2,8 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 import configparser
+from urllib.requests import urlopen
+import json
 
 def koaxfr(utDate, wxDir, log_writer=''):
     """
@@ -28,6 +30,9 @@ def koaxfr(utDate, wxDir, log_writer=''):
     transferAcct = config['KOAXFR']['ACCOUNT']
     transferDir = config['KOAXFR']['DIR']
 
+    api = config['API']['INGESTAPI']
+    url = f"{api}instrument=weather&date={utDate.replace('-', '')}"
+
     xfr_to = ''.join((transferAcct, '@', transferTo, ':', transferDir))
 
     try:
@@ -39,9 +44,19 @@ def koaxfr(utDate, wxDir, log_writer=''):
             log_writer.info('koaxfr.py {}'.format(cmd))
 
         os.system(cmd)
-        subject = ''.join(('weather ', utDate))
-        message = 'weather data successfully transferred to koaxfr'
-        send_email(emailTo, emailFrom, subject, message, log_writer)
+#        subject = ''.join(('weather ', utDate))
+#        message = 'weather data successfully transferred to koaxfr'
+#        send_email(emailTo, emailFrom, subject, message, log_writer)
+        log.info('koaxfr.py sending API call to {}'.format(url))
+        data = urlopen(url)
+        data = data.read().decode('utf8')
+        data = json.loads(data)
+        data = json.loads(data) # Need two for IPAC API
+        # Success?
+        if not data or data.get('stat').lower() != 'ok':
+            subject = 'IPAC API FAILURE'
+            message = f"IPAC API failure\n\n{url}"
+            send_email(emailError, emailFrom, subject, message)
     except:
         if log_writer:
             log_writer.error('koaxfr.py error transferring directory ({}) to NExScI'.format(wxDir))
