@@ -153,14 +153,14 @@ os.makedirs(wxDir+'/nightly1')
 os.makedirs(wxDir+'/nightly2')
 if dbUpdate:
     for i in range(1,3):
-        wxdb.updateWxDb(utDate, f'nightly{i}', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
+        wxdb.updateWxDb(utDate, f'nightly{i}', datetime.utcnow().strftime('%Y%m%d %H:%M:%S'), log_writer)
 
 # Call make_nightly_plots to create weather and fwhm plots
 
 log_writer.info('weather.py calling make_nightly_plots.py')
 mn.make_nightly_plots(utDate, wxDir, log_writer)
 if dbUpdate:
-    wxdb.updateWxDb(utDate, 'graphs', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
+    wxdb.updateWxDb(utDate, 'graphs', datetime.utcnow().strftime('%Y%m%d %H:%M:%S'), log_writer)
 
 # Get CFHT Skyprobe plot
 
@@ -238,7 +238,7 @@ if dbUpdate:
     koaxfr.koaxfr(utDate, wxDir)
 
 if dbUpdate:
-    wxdb.updateWxDb(utDate, 'data_sent', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
+    wxdb.updateWxDb(utDate, 'data_sent', datetime.utcnow().strftime('%Y%m%d %H:%M:%S'), log_writer)
 
 log_writer.info('weather.py complete for {}'.format(utDate))
 
