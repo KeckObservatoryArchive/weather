@@ -2,7 +2,7 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 import configparser
-from urllib.requests import urlopen
+from urllib.request import urlopen
 import json
 
 def koaxfr(utDate, wxDir, log_writer=''):
@@ -47,7 +47,7 @@ def koaxfr(utDate, wxDir, log_writer=''):
 #        subject = ''.join(('weather ', utDate))
 #        message = 'weather data successfully transferred to koaxfr'
 #        send_email(emailTo, emailFrom, subject, message, log_writer)
-        log.info('koaxfr.py sending API call to {}'.format(url))
+        if log_writer: log.info('koaxfr.py sending API call to {}'.format(url))
         data = urlopen(url)
         data = data.read().decode('utf8')
         data = json.loads(data)
