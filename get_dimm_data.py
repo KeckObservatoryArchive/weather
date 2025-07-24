@@ -99,7 +99,7 @@ def get_dimm_data(utDate='', mdir='.', log_writer=''):
         # Get JPG plots
 
         plots = {
-        'CFHT Weather Tower Seeing':'http://hokukea.soest.hawaii.edu/current/seeing/images/YYYYMMDD.wrf-vs-mkam.timeseries.jpg',
+        'CFHT Weather Tower Seeing':'http://hokukea.soest.hawaii.edu/current/seeing/images/YYYYMMDD.seeingtimeseries.jpg',
         'CFHT MASS Profile':' http://hokukea.soest.hawaii.edu/current/seeing/images/YYYYMMDD.massprofile.jpg',
         'CFHT DIMM Seeing Histogram':'http://hokukea.soest.hawaii.edu/current/seeing/analysis/images/dimmdailyhistogram.jpg',
         'CFHT MASS Seeing Histogram':'http://hokukea.soest.hawaii.edu/current/seeing/analysis/images/massdailyhistogram.jpg'
@@ -178,7 +178,7 @@ def create_bokeh_plot(utDate, mdir):
         data = data.rename(index=str, columns=keysRename)
 
         # Set date column
-        dateCol = pd.to_datetime(data['year']+data['month']+data['day']+' '+data['hour']+data['minute']+data['second'], format='%Y%m%d %H:%M:%S')
+        dateCol = pd.to_datetime(data['year']+data['month']+data['day']+' '+data['hour']+data['minute']+data['second'], format='%Y%m%d %H%M%S')
         dateCol += dt.timedelta(hours=10)
         data = data.assign(date=dateCol)
         data['seeing'] = pd.to_numeric(data['seeing'])

@@ -32,7 +32,7 @@ def skyprobe(utDate='', dir='.', log_writer=''):
 
     # URL to copy
 
-    url = 'http://nenue.cfht.hawaii.edu/Instruments/Elixir/skyprobe/archive/mcal_'
+    url = 'https://www.cfht.hawaii.edu/Instruments/Elixir/skyprobe/archive/mcal_'
     joinSeq = (url, utDate, '.png')
     url = ''.join(joinSeq)
 
