@@ -25,7 +25,7 @@
 
 import verification
 import logging as lg
-from datetime import datetime
+import datetime as dt
 from sys import argv
 import subprocess as sp
 import weather_nightly as wn
@@ -51,7 +51,7 @@ emailError = config['KOAXFR']['EMAILERROR']
 # Default UT date is today
 # Runs at 2pm, so use now()
 
-utDate = datetime.now().strftime('%Y-%m-%d')
+utDate = dt.datetime.now().strftime('%Y-%m-%d')
 dbUpdate = 1
 
 # Usage can have 0 or 1 additional arguments
@@ -153,14 +153,14 @@ os.makedirs(wxDir+'/nightly1')
 os.makedirs(wxDir+'/nightly2')
 if dbUpdate:
     for i in range(1,3):
-        wxdb.updateWxDb(utDate, f'nightly{i}', datetime.utcnow().strftime('%Y%m%d %H:%M:%S'), log_writer)
+        wxdb.updateWxDb(utDate, f'nightly{i}', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d %H:%M:%S'), log_writer)
 
 # Call make_nightly_plots to create weather and fwhm plots
 
 log_writer.info('weather.py calling make_nightly_plots.py')
 mn.make_nightly_plots(utDate, wxDir, log_writer)
 if dbUpdate:
-    wxdb.updateWxDb(utDate, 'graphs', datetime.utcnow().strftime('%Y%m%d %H:%M:%S'), log_writer)
+    wxdb.updateWxDb(utDate, 'graphs', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d %H:%M:%S'), log_writer)
 
 # Get CFHT Skyprobe plot
 
@@ -238,7 +238,7 @@ if dbUpdate:
     koaxfr.koaxfr(utDate, wxDir)
 
 if dbUpdate:
-    wxdb.updateWxDb(utDate, 'data_sent', datetime.utcnow().strftime('%Y%m%d %H:%M:%S'), log_writer)
+    wxdb.updateWxDb(utDate, 'data_sent', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d %H:%M:%S'), log_writer)
 
 log_writer.info('weather.py complete for {}'.format(utDate))
 

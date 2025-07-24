@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime as dt
 import urllib.request
 import os
 import verification
@@ -20,7 +20,7 @@ def skyprobe(utDate='', dir='.', log_writer=''):
     # If no utDate supplied, use the current value
 
     if utDate == '':
-        utDate = datetime.datetime.utcnow().strftime('%Y%m%d')
+        utDate = dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d')
 
     verification.verify_date(utDate)
 
@@ -77,4 +77,4 @@ def skyprobe(utDate='', dir='.', log_writer=''):
 
     if log_writer:
         log_writer.info('skyprobe.py complete for {}'.format(utDate))
-    wxdb.updateWxDb(dbDate, 'skyprobe', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
+    wxdb.updateWxDb(dbDate, 'skyprobe', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d+%H:%M:%S'), log_writer)

@@ -2,7 +2,6 @@ import configparser
 from urllib.request import urlopen
 import json
 import time
-from datetime import datetime, timedelta
 import os
 import pandas as pd
 import numpy as np

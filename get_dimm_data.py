@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+import datetime as dt
 import requests
 import re
 import os
@@ -26,7 +26,7 @@ def get_dimm_data(utDate='', mdir='.', log_writer=''):
     # If no utDate supplied, use the current value
 
     if utDate == '':
-        utDate = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        utDate = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%d')
 
     verification.verify_date(utDate)
 
@@ -133,7 +133,7 @@ def get_dimm_data(utDate='', mdir='.', log_writer=''):
 
     if log_writer:
         log_writer.info('get_dimm_data.py complete for {}'.format(utDate))
-    wxdb.updateWxDb(dbDate, 'cfht_seeing', datetime.utcnow().strftime('%Y%m%d %H:%M:%S'), log_writer)
+    wxdb.updateWxDb(dbDate, 'cfht_seeing', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d %H:%M:%S'), log_writer)
 
     for n in ['mass', 'dimm', 'masspro']:
         joinSeq = (mdir, '/', utDate, '.mkwc.', n, '.dat')
@@ -180,7 +180,7 @@ def create_bokeh_plot(utDate, mdir):
 
         # Set date column
         dateCol = pd.to_datetime(data['year']+data['month']+data['day']+' '+data['hour']+data['minute']+data['second'], format='%Y%m%d %H:%M:%S')
-        dateCol += timedelta(hours=10)
+        dateCol += dt.timedelta(hours=10)
         data = data.assign(date=dateCol)
         data['seeing'] = pd.to_numeric(data['seeing'])
 
