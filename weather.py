@@ -23,7 +23,7 @@
 #
 #---------------------------------------------------------------
 
-import verification
+import argparse
 import logging as lg
 import datetime as dt
 from sys import argv
@@ -51,25 +51,23 @@ emailError = config['KOAXFR']['EMAILERROR']
 # Default UT date is today
 # Runs at 2pm, so use now()
 
-utDate = dt.datetime.now().strftime('%Y-%m-%d')
-dbUpdate = 1
+parser = argparse.ArgumentParser(description='KOA weather archiving')
+parser.add_argument('wxDir', help='Directory for output files')
+parser.add_argument('--utdate', type=str, 
+                    default=dt.datetime.now().strftime('%Y-%m-%d'), 
+                    help='UT date of weather data to archive')
+parser.add_argument('--nodb', dest='dbUpdate', default=True, 
+                    action='store_false', 
+                    help='Do not write information to the database')
 
-# Usage can have 0 or 1 additional arguments
+args = parser.parse_args()
+wxDir = args.wxDir
+utDate = args.utdate
+dbUpdate = 1 if args.dbUpdate == True else 0
 
-assert len(argv) >= 2, 'Usage: weather.py wxDir [YYYY-MM-DD] [-nodb]'
-
-# Parse UT date from argument list
-
-if len(argv) >= 2:
-    wxDir = argv[1]
-    if len(argv) >= 3:
-        utDate = argv[2].replace('/', '-')
-    if len(argv) == 4:
-        dbUpdate = 0
-
-# Verify date, will exit if verification fails
-
-verification.verify_date(utDate)
+print(wxDir, utDate, dbUpdate)
+assert dt.datetime.strptime(utDate, '%Y-%m-%d')
+exit()
 
 # Setup logging
 
