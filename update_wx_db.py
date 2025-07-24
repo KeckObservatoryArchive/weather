@@ -19,12 +19,6 @@ def updateWxDb(utDate, column, value, log_writer=''):
     @type log_writer: logging
     """
 
-    user = os.getlogin()
-    if user != 'koaadmin':
-        if log_writer:
-            log_writer.info('update_wx_db.py incorrect user for database update')
-        return
-
     # Database access URL
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
