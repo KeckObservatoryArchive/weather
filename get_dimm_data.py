@@ -133,7 +133,7 @@ def get_dimm_data(utDate='', mdir='.', log_writer=''):
 
     if log_writer:
         log_writer.info('get_dimm_data.py complete for {}'.format(utDate))
-    wxdb.updateWxDb(dbDate, 'cfht_seeing', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
+    wxdb.updateWxDb(dbDate, 'cfht_seeing', datetime.utcnow().strftime('%Y%m%d %H:%M:%S'), log_writer)
 
     for n in ['mass', 'dimm', 'masspro']:
         joinSeq = (mdir, '/', utDate, '.mkwc.', n, '.dat')
