@@ -2,7 +2,6 @@ import datetime as dt
 import os
 import shutil
 import subprocess as sp
-import verification
 import update_wx_db as wxdb
 
 def weather_nightly(utDate='', wxDir='.', dbUpdate=1, log_writer=''):
@@ -24,7 +23,7 @@ def weather_nightly(utDate='', wxDir='.', dbUpdate=1, log_writer=''):
     if log_writer:
         log_writer.info('weather_nightly.py started for {}'.format(utDate))
 
-    verification.verify_date(utDate)
+    assert dt.datetime.strptime(utDate, '%Y-%m-%d')
 
     utDate = utDate.replace('/', '-')
     utDate_split = utDate.split('-')

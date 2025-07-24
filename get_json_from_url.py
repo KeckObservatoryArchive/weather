@@ -7,7 +7,6 @@ def get_json_from_url(url):
     @param url: URL to read and convert JSON to Python list
     '''
 
-    import verification
     import json
     import urllib.request
 

@@ -1,7 +1,6 @@
 import datetime as dt
 import urllib.request
 import os
-import verification
 import update_wx_db as wxdb
 
 def skyprobe(utDate='', dir='.', log_writer=''):
@@ -22,7 +21,7 @@ def skyprobe(utDate='', dir='.', log_writer=''):
     if utDate == '':
         utDate = dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d')
 
-    verification.verify_date(utDate)
+    assert dt.datetime.strptime(utDate, '%Y-%m-%d')
 
     utDate = utDate.replace('/', '-')
     dbDate = utDate

@@ -2,7 +2,6 @@ import datetime as dt
 import requests
 import re
 import os
-import verification
 import urllib.request
 import update_wx_db as wxdb
 import pandas as pd
@@ -28,7 +27,7 @@ def get_dimm_data(utDate='', mdir='.', log_writer=''):
     if utDate == '':
         utDate = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%d')
 
-    verification.verify_date(utDate)
+    assert dt.datetime.strptime(utDate, '%Y-%m-%d')
 
     utDate = utDate.replace('/', '-')
     split = utDate.split('-')
