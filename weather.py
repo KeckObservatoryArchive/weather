@@ -4,30 +4,11 @@
 # various sources.  This information is archived in KOA for
 # users to view at any time.
 #
-# Usage: weather.py wxDir [YYYY-MM-DD]
-#
-# @param wxDir: output directory location
-# @type wxDir: string
-# @param YYYY-MM-DD: UT date
-# @type YYYY-MM-DD: string
-#
-# Log is wxDir/weather_utDate.log
-#
-# Calls:
-# - weather_nightly(utDate, wxDir, log_writer)
-# - make_nightly_plots(utDate, wxDir, log_writer)
-# - skyprobe(utDate, wxDir, log_writer)
-# - get_dimm_data(utDate, wxDir, log_writer)
-#
-# Written by Jeff Mader
-#
 #---------------------------------------------------------------
 
 import argparse
 import logging as lg
 import datetime as dt
-from sys import argv
-import subprocess as sp
 import weather_nightly as wn
 import make_nightly_plots as mn
 import os
@@ -36,8 +17,8 @@ import skyprobe as sky
 import get_dimm_data as dimm
 import hashlib
 import urllib.request
-import json
 import update_wx_db as wxdb
+import kpfsocal
 import koaxfr
 import configparser
 
@@ -67,7 +48,6 @@ dbUpdate = 1 if args.dbUpdate == True else 0
 
 print(wxDir, utDate, dbUpdate)
 assert dt.datetime.strptime(utDate, '%Y-%m-%d')
-exit()
 
 # Setup logging
 
@@ -152,6 +132,9 @@ os.makedirs(wxDir+'/nightly2')
 if dbUpdate:
     for i in range(1,3):
         wxdb.updateWxDb(utDate, f'nightly{i}', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d %H:%M:%S'), log_writer)
+
+# Get KPF SoCal data
+kpfsocal.kpfsocal(utDate, wxDir, log_writer)
 
 # Call make_nightly_plots to create weather and fwhm plots
 
