@@ -4,30 +4,11 @@
 # various sources.  This information is archived in KOA for
 # users to view at any time.
 #
-# Usage: weather.py wxDir [YYYY-MM-DD]
-#
-# @param wxDir: output directory location
-# @type wxDir: string
-# @param YYYY-MM-DD: UT date
-# @type YYYY-MM-DD: string
-#
-# Log is wxDir/weather_utDate.log
-#
-# Calls:
-# - weather_nightly(utDate, wxDir, log_writer)
-# - make_nightly_plots(utDate, wxDir, log_writer)
-# - skyprobe(utDate, wxDir, log_writer)
-# - get_dimm_data(utDate, wxDir, log_writer)
-#
-# Written by Jeff Mader
-#
 #---------------------------------------------------------------
 
-import verification
+import argparse
 import logging as lg
-from datetime import datetime
-from sys import argv
-import subprocess as sp
+import datetime as dt
 import weather_nightly as wn
 import make_nightly_plots as mn
 import os
@@ -36,8 +17,8 @@ import skyprobe as sky
 import get_dimm_data as dimm
 import hashlib
 import urllib.request
-import json
 import update_wx_db as wxdb
+import kpfsocal
 import koaxfr
 import configparser
 
@@ -51,25 +32,22 @@ emailError = config['KOAXFR']['EMAILERROR']
 # Default UT date is today
 # Runs at 2pm, so use now()
 
-utDate = datetime.now().strftime('%Y-%m-%d')
-dbUpdate = 1
+parser = argparse.ArgumentParser(description='KOA weather archiving')
+parser.add_argument('wxDir', help='Directory for output files')
+parser.add_argument('--utdate', type=str, 
+                    default=dt.datetime.now().strftime('%Y-%m-%d'), 
+                    help='UT date of weather data to archive')
+parser.add_argument('--nodb', dest='dbUpdate', default=True, 
+                    action='store_false', 
+                    help='Do not write information to the database')
 
-# Usage can have 0 or 1 additional arguments
+args = parser.parse_args()
+wxDir = args.wxDir
+utDate = args.utdate
+dbUpdate = 1 if args.dbUpdate == True else 0
 
-assert len(argv) >= 2, 'Usage: weather.py wxDir [YYYY-MM-DD] [-nodb]'
-
-# Parse UT date from argument list
-
-if len(argv) >= 2:
-    wxDir = argv[1]
-    if len(argv) >= 3:
-        utDate = argv[2].replace('/', '-')
-    if len(argv) == 4:
-        dbUpdate = 0
-
-# Verify date, will exit if verification fails
-
-verification.verify_date(utDate)
+print(wxDir, utDate, dbUpdate)
+assert dt.datetime.strptime(utDate, '%Y-%m-%d')
 
 # Setup logging
 
@@ -153,14 +131,17 @@ os.makedirs(wxDir+'/nightly1')
 os.makedirs(wxDir+'/nightly2')
 if dbUpdate:
     for i in range(1,3):
-        wxdb.updateWxDb(utDate, f'nightly{i}', datetime.utcnow().strftime('%Y%m%d %H:%M:%S'), log_writer)
+        wxdb.updateWxDb(utDate, f'nightly{i}', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d %H:%M:%S'), log_writer)
+
+# Get KPF SoCal data
+kpfsocal.kpfsocal(utDate, wxDir, log_writer)
 
 # Call make_nightly_plots to create weather and fwhm plots
 
 log_writer.info('weather.py calling make_nightly_plots.py')
 mn.make_nightly_plots(utDate, wxDir, log_writer)
 if dbUpdate:
-    wxdb.updateWxDb(utDate, 'graphs', datetime.utcnow().strftime('%Y%m%d %H:%M:%S'), log_writer)
+    wxdb.updateWxDb(utDate, 'graphs', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d %H:%M:%S'), log_writer)
 
 # Get CFHT Skyprobe plot
 
@@ -238,7 +219,7 @@ if dbUpdate:
     koaxfr.koaxfr(utDate, wxDir)
 
 if dbUpdate:
-    wxdb.updateWxDb(utDate, 'data_sent', datetime.utcnow().strftime('%Y%m%d %H:%M:%S'), log_writer)
+    wxdb.updateWxDb(utDate, 'data_sent', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d %H:%M:%S'), log_writer)
 
 log_writer.info('weather.py complete for {}'.format(utDate))
 

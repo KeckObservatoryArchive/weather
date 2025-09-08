@@ -1,7 +1,6 @@
-from datetime import datetime
+import datetime as dt
 import urllib.request
 import os
-import verification
 import update_wx_db as wxdb
 
 def skyprobe(utDate='', dir='.', log_writer=''):
@@ -20,9 +19,9 @@ def skyprobe(utDate='', dir='.', log_writer=''):
     # If no utDate supplied, use the current value
 
     if utDate == '':
-        utDate = datetime.datetime.utcnow().strftime('%Y%m%d')
+        utDate = dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d')
 
-    verification.verify_date(utDate)
+    assert dt.datetime.strptime(utDate, '%Y-%m-%d')
 
     utDate = utDate.replace('/', '-')
     dbDate = utDate
@@ -33,7 +32,7 @@ def skyprobe(utDate='', dir='.', log_writer=''):
 
     # URL to copy
 
-    url = 'http://nenue.cfht.hawaii.edu/Instruments/Elixir/skyprobe/archive/mcal_'
+    url = 'https://www.cfht.hawaii.edu/Instruments/Elixir/skyprobe/archive/mcal_'
     joinSeq = (url, utDate, '.png')
     url = ''.join(joinSeq)
 
@@ -77,4 +76,4 @@ def skyprobe(utDate='', dir='.', log_writer=''):
 
     if log_writer:
         log_writer.info('skyprobe.py complete for {}'.format(utDate))
-    wxdb.updateWxDb(dbDate, 'skyprobe', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
+    wxdb.updateWxDb(dbDate, 'skyprobe', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d+%H:%M:%S'), log_writer)
