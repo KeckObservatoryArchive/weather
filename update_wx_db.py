@@ -19,12 +19,6 @@ def updateWxDb(utDate, column, value, log_writer=''):
     @type log_writer: logging
     """
 
-    user = os.getlogin()
-    if user != 'koaadmin':
-        if log_writer:
-            log_writer.info('update_wx_db.py incorrect user for database update')
-        return
-
     # Database access URL
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -36,7 +30,9 @@ def updateWxDb(utDate, column, value, log_writer=''):
     dbdb   = config['DB']['DB']
 
     try:
-        dbConn = pymysql.connect(dbhost, dbuser, dbpass, dbdb, cursorclass=pymysql.cursors.DictCursor)
+        dbConn = pymysql.connect(host=dbhost, user=dbuser, password=dbpass,
+                                 database=dbdb, autocommit=True,
+                                 cursorclass=pymysql.cursors.DictCursor)
     except:
         if log_writer:
             log_writer.info('update_wx_db.py could not connect to koa database')

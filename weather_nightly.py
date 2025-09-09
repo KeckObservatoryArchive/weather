@@ -1,8 +1,7 @@
-from datetime import datetime
+import datetime as dt
 import os
 import shutil
 import subprocess as sp
-import verification
 import update_wx_db as wxdb
 
 def weather_nightly(utDate='', wxDir='.', dbUpdate=1, log_writer=''):
@@ -16,7 +15,7 @@ def weather_nightly(utDate='', wxDir='.', dbUpdate=1, log_writer=''):
     '''
 
     if utDate == '':
-        utDate = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        utDate = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%d')
 
     if not wxDir:
         exit
@@ -24,7 +23,7 @@ def weather_nightly(utDate='', wxDir='.', dbUpdate=1, log_writer=''):
     if log_writer:
         log_writer.info('weather_nightly.py started for {}'.format(utDate))
 
-    verification.verify_date(utDate)
+    assert dt.datetime.strptime(utDate, '%Y-%m-%d')
 
     utDate = utDate.replace('/', '-')
     utDate_split = utDate.split('-')
@@ -72,7 +71,7 @@ def weather_nightly(utDate='', wxDir='.', dbUpdate=1, log_writer=''):
 
         # Update koa.koawx entry
 
-        if dbUpdate: wxdb.updateWxDb(utDate, f'nightly{i}', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
+        if dbUpdate: wxdb.updateWxDb(utDate, f'nightly{i}', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d+%H:%M:%S'), log_writer)
 
     if log_writer:
         log_writer.info('weather_nightly.py complete for {}'.format(utDate))

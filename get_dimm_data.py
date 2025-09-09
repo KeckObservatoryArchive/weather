@@ -1,8 +1,7 @@
-from datetime import datetime, timedelta
+import datetime as dt
 import requests
 import re
 import os
-import verification
 import urllib.request
 import update_wx_db as wxdb
 import pandas as pd
@@ -26,9 +25,9 @@ def get_dimm_data(utDate='', mdir='.', log_writer=''):
     # If no utDate supplied, use the current value
 
     if utDate == '':
-        utDate = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        utDate = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%d')
 
-    verification.verify_date(utDate)
+    assert dt.datetime.strptime(utDate, '%Y-%m-%d')
 
     utDate = utDate.replace('/', '-')
     split = utDate.split('-')
@@ -100,7 +99,7 @@ def get_dimm_data(utDate='', mdir='.', log_writer=''):
         # Get JPG plots
 
         plots = {
-        'CFHT Weather Tower Seeing':'http://hokukea.soest.hawaii.edu/current/seeing/images/YYYYMMDD.wrf-vs-mkam.timeseries.jpg',
+        'CFHT Weather Tower Seeing':'http://hokukea.soest.hawaii.edu/current/seeing/images/YYYYMMDD.seeingtimeseries.jpg',
         'CFHT MASS Profile':' http://hokukea.soest.hawaii.edu/current/seeing/images/YYYYMMDD.massprofile.jpg',
         'CFHT DIMM Seeing Histogram':'http://hokukea.soest.hawaii.edu/current/seeing/analysis/images/dimmdailyhistogram.jpg',
         'CFHT MASS Seeing Histogram':'http://hokukea.soest.hawaii.edu/current/seeing/analysis/images/massdailyhistogram.jpg'
@@ -133,7 +132,7 @@ def get_dimm_data(utDate='', mdir='.', log_writer=''):
 
     if log_writer:
         log_writer.info('get_dimm_data.py complete for {}'.format(utDate))
-    wxdb.updateWxDb(dbDate, 'cfht_seeing', datetime.utcnow().strftime('%Y%m%d+%H:%M:%S'), log_writer)
+    wxdb.updateWxDb(dbDate, 'cfht_seeing', dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d %H:%M:%S'), log_writer)
 
     for n in ['mass', 'dimm', 'masspro']:
         joinSeq = (mdir, '/', utDate, '.mkwc.', n, '.dat')
@@ -179,8 +178,8 @@ def create_bokeh_plot(utDate, mdir):
         data = data.rename(index=str, columns=keysRename)
 
         # Set date column
-        dateCol = pd.to_datetime(data['year']+data['month']+data['day']+' '+data['hour']+data['minute']+data['second'], format='%Y%m%d %H:%M:%S')
-        dateCol += timedelta(hours=10)
+        dateCol = pd.to_datetime(data['year']+data['month']+data['day']+' '+data['hour']+data['minute']+data['second'], format='%Y%m%d %H%M%S')
+        dateCol += dt.timedelta(hours=10)
         data = data.assign(date=dateCol)
         data['seeing'] = pd.to_numeric(data['seeing'])
 
