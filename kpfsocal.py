@@ -63,10 +63,15 @@ def kpfsocal(utDate=None, dir='.', log_writer=None):
             split = line.split(',')
             if len(line) == 0:
                 continue
-            check = start if num == 0 else \
-              dt.datetime.strptime(split[0], "%Y-%m-%dT%H:%M:%S.%f")
-            if start <= check < end:
-                f.write(line)
+            # gshow doesn't always return data            
+            # "Discarded values..."           
+            try:
+                check = start if num == 0 else \
+                  dt.datetime.strptime(split[0], "%Y-%m-%dT%H:%M:%S.%f")
+                if start <= check < end:
+                    f.write(line)
+            except:            
+                pass            
 
     if log_writer:
         log_writer.info(f'kpfsocal.py complete for {utDate}')
